@@ -1,0 +1,2 @@
+# Osaki_BMG
+IBOでIdeationするためのアプリ
