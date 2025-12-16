@@ -35,7 +35,7 @@ const schema = {
   },
   required: ["reply"],
   additionalProperties: false,
-};
+} as const;
 
 export async function chatWithAI(messages: Message[]): Promise<ChatResult> {
   if (!process.env.OPENAI_API_KEY) {
