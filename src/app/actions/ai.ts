@@ -44,17 +44,10 @@ export async function chatWithAI(messages: Message[]): Promise<ChatResult> {
     };
   }
 
-  const completion = await openai.responses.create({
-    model: "gpt-4.1-mini",
-    response_format: {
-      type: "json_schema",
-      json_schema: {
-        name: "workspace_assistant_reply",
-        schema,
-        strict: true,
-      },
-    },
-    input: [
+  const completion = await openai.chat.completions.create({
+    model: "gpt-4o-mini",
+    response_format: { type: "json_object" },
+    messages: [
       {
         role: "system",
         content:
@@ -62,10 +55,16 @@ export async function chatWithAI(messages: Message[]): Promise<ChatResult> {
       },
       ...messages,
     ],
+    functions: [
+      {
+        name: "workspace_assistant_reply",
+        parameters: schema,
+      },
+    ],
+    function_call: { name: "workspace_assistant_reply" },
   });
 
-  const content = completion.output[0]?.content?.[0];
-  const rawText = content && "text" in content ? content.text : undefined;
+  const rawText = completion.choices[0]?.message?.content;
 
   if (!rawText) {
     return {
