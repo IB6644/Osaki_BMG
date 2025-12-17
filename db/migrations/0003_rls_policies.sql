@@ -45,6 +45,7 @@ $$;
 
 -- Workspaces policies
 DROP POLICY IF EXISTS "Workspace visible to members" ON workspaces;
+drop policy if exists "Workspace members can read workspace" on workspaces;
 create policy "Workspace members can read workspace" on workspaces
   for select using (
     is_workspace_member(id)
@@ -53,6 +54,7 @@ create policy "Workspace members can read workspace" on workspaces
 
 -- Teams policies
 DROP POLICY IF EXISTS "Teams visible to workspace members" ON teams;
+drop policy if exists "Workspace members can read teams" on teams;
 create policy "Workspace members can read teams" on teams
   for select using (
     exists (
@@ -67,6 +69,7 @@ DROP POLICY IF EXISTS "Members can manage memberships in workspace" ON team_memb
 DROP POLICY IF EXISTS "Members can update memberships in workspace" ON team_memberships;
 DROP POLICY IF EXISTS "Members can delete their memberships" ON team_memberships;
 
+drop policy if exists "Workspace members can read memberships" on team_memberships;
 create policy "Workspace members can read memberships" on team_memberships
   for select using (
     exists (
@@ -74,6 +77,7 @@ create policy "Workspace members can read memberships" on team_memberships
     )
   );
 
+drop policy if exists "Members can insert their memberships" on team_memberships;
 create policy "Members can insert their memberships" on team_memberships
   for insert with check (
     auth.uid() = user_id
@@ -82,6 +86,7 @@ create policy "Members can insert their memberships" on team_memberships
     )
   );
 
+drop policy if exists "Allow onboarding into demo workspace" on team_memberships;
 create policy "Allow onboarding into demo workspace" on team_memberships
   for insert with check (
     auth.uid() = user_id
@@ -90,6 +95,7 @@ create policy "Allow onboarding into demo workspace" on team_memberships
     )
   );
 
+drop policy if exists "Members can update their memberships" on team_memberships;
 create policy "Members can update their memberships" on team_memberships
   for update using (
     auth.uid() = user_id
@@ -103,6 +109,7 @@ create policy "Members can update their memberships" on team_memberships
     )
   );
 
+drop policy if exists "Members can delete their memberships" on team_memberships;
 create policy "Members can delete their memberships" on team_memberships
   for delete using (
     auth.uid() = user_id
@@ -115,6 +122,7 @@ create policy "Members can delete their memberships" on team_memberships
 DROP POLICY IF EXISTS "Members can read team ideas" ON ideas;
 DROP POLICY IF EXISTS "Editors can add ideas" ON ideas;
 
+drop policy if exists "Workspace members can read team ideas" on ideas;
 create policy "Workspace members can read team ideas" on ideas
   for select using (
     exists (
@@ -122,6 +130,7 @@ create policy "Workspace members can read team ideas" on ideas
     )
   );
 
+drop policy if exists "Editors can manage ideas" on ideas;
 create policy "Editors can manage ideas" on ideas
   for insert with check (
     exists (
@@ -129,6 +138,7 @@ create policy "Editors can manage ideas" on ideas
     )
   );
 
+drop policy if exists "Editors can update ideas" on ideas;
 create policy "Editors can update ideas" on ideas
   for update using (
     exists (
@@ -140,6 +150,7 @@ create policy "Editors can update ideas" on ideas
     )
   );
 
+drop policy if exists "Editors can delete ideas" on ideas;
 create policy "Editors can delete ideas" on ideas
   for delete using (
     exists (
