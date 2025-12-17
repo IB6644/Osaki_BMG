@@ -83,17 +83,12 @@ alter table profiles enable row level security;
 alter table team_memberships enable row level security;
 alter table ideas enable row level security;
 
--- Profiles policies
 drop policy if exists "Profiles are self managed" on profiles;
+create policy "Profiles are self managed" on profiles
+  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
-create policy "Profiles are self managed"
-on profiles
-for all
-using (auth.uid() = user_id)
-with check (auth.uid() = user_id);
-
--- Workspaces policies (initial onboarding)
-create policy if not exists "Workspace visible to members" on workspaces
+drop policy if exists "Workspace visible to members" on workspaces;
+create policy "Workspace visible to members" on workspaces
   for select using (
     exists (
       select 1 from teams t
@@ -103,32 +98,34 @@ create policy if not exists "Workspace visible to members" on workspaces
     or workspaces.id = '00000000-0000-0000-0000-000000000001'
   );
 
--- Teams policies
-create policy if not exists "Teams visible to members" on teams
+drop policy if exists "Teams visible to members" on teams;
+create policy "Teams visible to members" on teams
   for select using (
     exists (
       select 1 from team_memberships tm where tm.team_id = teams.id and tm.user_id = auth.uid()
     )
   );
 
--- Membership policies (demo self-join)
-create policy if not exists "Members can view their memberships" on team_memberships
+drop policy if exists "Members can view their memberships" on team_memberships;
+create policy "Members can view their memberships" on team_memberships
   for select using (auth.uid() = user_id);
 
-create policy if not exists "Members can upsert themselves into demo team" on team_memberships
+drop policy if exists "Members can upsert themselves into demo team" on team_memberships;
+create policy "Members can upsert themselves into demo team" on team_memberships
   for insert with check (
     auth.uid() = user_id and team_id = '00000000-0000-0000-0000-000000000002'
   );
 
--- Idea policies
-create policy if not exists "Members can read team ideas" on ideas
+drop policy if exists "Members can read team ideas" on ideas;
+create policy "Members can read team ideas" on ideas
   for select using (
     exists (
       select 1 from team_memberships tm where tm.team_id = ideas.team_id and tm.user_id = auth.uid()
     )
   );
 
-create policy if not exists "Editors can add ideas" on ideas
+drop policy if exists "Editors can add ideas" on ideas;
+create policy "Editors can add ideas" on ideas
   for insert with check (
     exists (
       select 1 from team_memberships tm
