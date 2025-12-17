@@ -84,8 +84,13 @@ alter table team_memberships enable row level security;
 alter table ideas enable row level security;
 
 -- Profiles policies
-create policy if not exists "Profiles are self managed" on profiles
-  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+drop policy if exists "Profiles are self managed" on profiles;
+
+create policy "Profiles are self managed"
+on profiles
+for all
+using (auth.uid() = user_id)
+with check (auth.uid() = user_id);
 
 -- Workspaces policies (initial onboarding)
 create policy if not exists "Workspace visible to members" on workspaces
