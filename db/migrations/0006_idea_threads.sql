@@ -10,7 +10,8 @@ create table if not exists idea_threads (
 
 alter table idea_threads enable row level security;
 
-create policy if not exists "Workspace members can read idea threads" on idea_threads
+drop policy if exists "Workspace members can read idea threads" on idea_threads;
+create policy "Workspace members can read idea threads" on idea_threads
   for select using (
     exists (
       select 1 from ideas i
@@ -19,7 +20,8 @@ create policy if not exists "Workspace members can read idea threads" on idea_th
     )
   );
 
-create policy if not exists "Editors can upsert idea threads" on idea_threads
+drop policy if exists "Editors can upsert idea threads" on idea_threads;
+create policy "Editors can upsert idea threads" on idea_threads
   for insert with check (
     exists (
       select 1 from ideas i
@@ -27,7 +29,8 @@ create policy if not exists "Editors can upsert idea threads" on idea_threads
     )
   );
 
-create policy if not exists "Editors can update idea threads" on idea_threads
+drop policy if exists "Editors can update idea threads" on idea_threads;
+create policy "Editors can update idea threads" on idea_threads
   for update using (
     exists (
       select 1 from ideas i
