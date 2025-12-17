@@ -63,6 +63,7 @@ update workspaces set team_count = team_count;
 
 -- broaden visibility to workspace-wide membership
 DROP POLICY IF EXISTS "Teams visible to members" ON teams;
+drop policy if exists "Teams visible to workspace members" on teams;
 create policy "Teams visible to workspace members" on teams
   for select using (
     exists (
@@ -76,15 +77,18 @@ create policy "Teams visible to workspace members" on teams
 DROP POLICY IF EXISTS "Members can view their memberships" ON team_memberships;
 DROP POLICY IF EXISTS "Members can upsert themselves into demo team" ON team_memberships;
 
+drop policy if exists "Members can view their memberships" on team_memberships;
 create policy "Members can view their memberships" on team_memberships
   for select using (auth.uid() = user_id);
 
+drop policy if exists "Members can manage memberships in workspace" on team_memberships;
 create policy "Members can manage memberships in workspace" on team_memberships
   for insert with check (
     auth.uid() = user_id
     and exists (select 1 from teams t where t.id = team_id)
   );
 
+drop policy if exists "Members can update memberships in workspace" on team_memberships;
 create policy "Members can update memberships in workspace" on team_memberships
   for update using (
     auth.uid() = user_id
@@ -94,5 +98,6 @@ create policy "Members can update memberships in workspace" on team_memberships
     and exists (select 1 from teams t where t.id = team_memberships.team_id)
   );
 
+drop policy if exists "Members can delete their memberships" on team_memberships;
 create policy "Members can delete their memberships" on team_memberships
   for delete using (auth.uid() = user_id);
