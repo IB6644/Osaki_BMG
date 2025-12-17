@@ -17,21 +17,24 @@ create index if not exists clusters_team_id_idx on clusters(team_id);
 
 alter table clusters enable row level security;
 
-create policy if not exists "Workspace members can read clusters" on clusters
+drop policy if exists "Workspace members can read clusters" on clusters;
+create policy "Workspace members can read clusters" on clusters
   for select using (
     exists (
       select 1 from teams t where t.id = clusters.team_id and is_workspace_member(t.workspace_id)
     )
   );
 
-create policy if not exists "Editors can manage clusters" on clusters
+drop policy if exists "Editors can manage clusters" on clusters;
+create policy "Editors can manage clusters" on clusters
   for insert with check (
     exists (
       select 1 from teams t where t.id = clusters.team_id and has_team_role(t.id, array['owner', 'editor'])
     )
   );
 
-create policy if not exists "Editors can update clusters" on clusters
+drop policy if exists "Editors can update clusters" on clusters;
+create policy "Editors can update clusters" on clusters
   for update using (
     exists (
       select 1 from teams t where t.id = clusters.team_id and has_team_role(t.id, array['owner', 'editor'])
@@ -42,7 +45,8 @@ create policy if not exists "Editors can update clusters" on clusters
     )
   );
 
-create policy if not exists "Editors can delete clusters" on clusters
+drop policy if exists "Editors can delete clusters" on clusters;
+create policy "Editors can delete clusters" on clusters
   for delete using (
     exists (
       select 1 from teams t where t.id = clusters.team_id and has_team_role(t.id, array['owner', 'editor'])
